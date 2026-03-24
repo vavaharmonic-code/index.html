@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>VAVA Harmonic - Global Workstation Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+        body {
+            background-color: #020617;
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at center, #0f172a, #000);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Professional Metallic Dark Blue & Glossy Grey Chassis */
+        .pro-chassis {
+            background-color: #1e293b; 
+            background-image: 
+                /* High-gloss specular top highlight */
+                linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 10%, rgba(255, 255, 255, 0) 30%),
+                /* Music Symbol Watermark Pattern */
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 10v30c0 4.418-3.582 8-8 8s-8-3.582-8-8 3.582-8 8-8c1.36 0 2.628.34 3.738.938V15h15v5H30z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E"),
+                /* Deep Blue-Grey darkening bottom fade */
+                linear-gradient(0deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0) 60%),
+                /* Metallic Blue-Grey Gradient blend */
+                linear-gradient(135deg, #1e293b 0%, #334155 25%, #1e3a8a 50%, #64748b 75%, #0f172a 100%);
+            border: 1px solid #0f172a;
+            border-top: 1px solid rgba(255, 255, 255, 0.4); /* Polished rim light */
+            box-shadow: 
+                0 40px 80px -15px rgba(0, 0, 0, 1),
+                inset 0 1px 0 rgba(255,255,255,0.15),
+                inset 0 -8px 25px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 1400px;
+            margin: auto;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .lcd-screen {
+            background-color: #0ea5e9;
+            background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1));
+            border: 4px solid #082f49;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.7), 0 0 10px rgba(14, 165, 233, 0.2);
+            font-family: 'Share Tech Mono', monospace;
+            color: #082f49;
+        }
+
+        .tactile-btn {
+            background: linear-gradient(to bottom, #334155, #0f172a);
+            border: 1px solid #000;
+            box-shadow: 0 2px 0 #000, inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: all 0.1s;
+            color: #94a3b8;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 9px;
+            letter-spacing: 0.05em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .tactile-btn:active { transform: translateY(1px); box-shadow: 0 1px 0 #000; }
+        .tactile-btn.active { background: #1e3a8a; color: #fff; box-shadow: inset 0 1px 5px rgba(0,0,0,0.8); border-color: #3b82f6; }
+
+        .led {
+            width: 5px; height: 5px; border-radius: 50%;
+            background-color: #0f172a;
+            box-shadow: inset 0 1px 1px rgba(0,0,0,0.5);
+            transition: background-color 0.2s;
+            margin-bottom: 4px;
+        }
+        .led.active { background-color: #ef4444; box-shadow: 0 0 10px #ef4444, inset 0 1px 1px rgba(255,255,255,0.4); }
+
+        .keyboard-scroll-wrap {
+            width: 100%;
+            overflow-x: auto;
+            background: #000;
+            border-radius: 4px;
+            padding: 5px 0;
+            scrollbar-width: thin;
+            scrollbar-color: #334155 transparent;
+            scroll-behavior: smooth;
+        }
+
+        .keyboard-container {
+            display: block;
+            position: relative;
+            background: #000;
+            height: 160px;
+            min-width: 100%;
+            touch-action: none; 
+        }
+
+        .key { cursor: pointer; transition: background 0.1s; position: absolute; height: 100%; }
+        .white-key {
+            background: linear-gradient(to bottom, #fff 0%, #f1f5f9 90%, #94a3b8 100%);
+            border: 1px solid #475569;
+            border-radius: 0 0 4px 4px;
+            z-index: 1;
+        }
+        .white-key.active { background: #bae6fd; box-shadow: inset 0 4px 15px rgba(0,0,0,0.3); }
+        
+        .black-key {
+            height: 60%;
+            background: linear-gradient(to bottom, #1e293b 0%, #020617 100%);
+            border: 1px solid #000;
+            z-index: 2;
+            border-radius: 0 0 3px 3px;
+            transform: translateX(-50%);
+            box-shadow: 2px 5px 10px rgba(0,0,0,0.5);
+        }
+        .black-key.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+
+        .voice-panel { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px; backdrop-blur: 10px; }
+        .category-tab { background: #020617; border: 1px solid #1e293b; color: #475569; font-size: 7px; padding: 4px 2px; text-transform: uppercase; font-weight: 900; cursor: pointer; flex: 1; text-align: center; }
+        .category-tab.active { background: #1e3a8a; color: #fff; border-bottom: 2px solid #3b82f6; }
+        .voice-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; height: 140px; overflow: hidden; }
+        .inst-preview-box { width: 50px; height: 50px; background: rgba(0, 0, 0, 0.6); border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        #inst-preview-img { max-width: 90%; max-height: 90%; object-fit: contain; filter: brightness(0.8) contrast(1.1); }
+
+        input[type=range].vertical { writing-mode: bt-lr; appearance: slider-vertical; width: 10px; height: 40px; }
+        .pitch-wheel { width: 45px; height: 120px; background: #020617; border-radius: 4px; border: 2px solid #1e293b; position: relative; overflow: hidden; }
+        .wheel-handle { width: 100%; height: 30px; background: repeating-linear-gradient(0deg, #1e293b, #1e293b 2px, #334155 2px, #334155 4px); position: absolute; top: 50%; transform: translateY(-50%); cursor: ns-resize; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+
+        @media (max-width: 640px) {
+            .pro-chassis { padding-top: 10px !important; }
+        }
+
+        ::-webkit-scrollbar { height: 6px; width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 3px; }
+    </style>
+</head>
+<body class="p-1 sm:p-4" onclick="initAudio()">
+
+    <div class="pro-chassis p-2 sm:p-6 rounded-xl flex flex-col gap-4 shadow-2xl">
+        <!-- Header -->
+        <div class="flex flex-wrap justify-between items-center bg-slate-950/70 p-2 sm:p-3 rounded-lg border border-white/10 gap-2 backdrop-blur-md">
+            <div class="flex flex-col min-w-[120px]">
+                <h1 class="text-base sm:text-2xl font-black tracking-tight text-white drop-shadow-lg">VAVA <span class="text-sky-500 font-normal italic uppercase">Harmonic</span></h1>
+                <p class="text-white/30 text-[7px] sm:text-[8px] font-bold uppercase leading-none tracking-widest">Master Studio Edition</p>
+            </div>
+            
+            <div class="flex items-center gap-2 sm:gap-4 ml-auto">
+                <!-- Key Width Control -->
+                <div class="flex flex-col items-center">
+                    <span class="text-[7px] font-bold text-white/40 uppercase">Key Width</span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="changeKeyWidth(-5)" class="tactile-btn w-6 h-6 rounded-sm">-</button>
+                        <button onclick="changeKeyWidth(5)" class="tactile-btn w-6 h-6 rounded-sm">+</button>
+                    </div>
+                </div>
+                <div class="h-6 w-px bg-white/10"></div>
+
+                <!-- Octave -->
+                <div class="flex flex-col items-center">
+                    <span class="text-[7px] font-bold text-white/40 uppercase">Oct</span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="changeOctave(-1)" class="tactile-btn w-5 h-5 rounded-sm">-</button>
+                        <span id="octave-display" class="text-[10px] font-bold text-sky-400 font-mono">0</span>
+                        <button onclick="changeOctave(1)" class="tactile-btn w-5 h-5 rounded-sm">+</button>
+                    </div>
+                </div>
+                <div class="h-6 w-px bg-white/10"></div>
+                
+                <div class="flex flex-col items-center">
+                    <span class="text-[7px] font-bold text-white/40 uppercase">Volume</span>
+                    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" class="w-20 sm:w-32 h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-500">
+                </div>
+                <div class="h-6 w-px bg-white/10"></div>
+                
+                <div class="flex flex-col items-center">
+                    <span class="text-[7px] font-bold text-white/40 uppercase">MIDI</span>
+                    <div id="midi-led" class="led h-2.5 w-2.5 m-0" title="MIDI Status"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-2 sm:gap-4 flex-1">
+            <!-- LCD -->
+            <div class="md:col-span-4">
+                <div class="lcd-screen rounded h-full min-h-[220px] p-3 sm:p-4 flex flex-col relative overflow-hidden">
+                    <canvas id="visualizer" class="absolute inset-0 w-full h-full opacity-30"></canvas>
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div class="flex flex-col">
+                            <span id="active-inst-display" class="text-base sm:text-lg font-black uppercase tracking-tighter leading-tight text-slate-900">GRAND PIANO</span>
+                            <span id="active-category-display" class="text-[7px] uppercase font-bold text-black/40">Section: Keyboard</span>
+                        </div>
+                        <div class="inst-preview-box">
+                            <img id="inst-preview-img" src="https://loremflickr.com/160/160/grand-piano,instrument" alt="inst">
+                        </div>
+                    </div>
+                    <div class="mt-auto relative z-10 grid grid-cols-5 gap-1 pb-1">
+                        <div class="flex flex-col items-center gap-1"><input type="range" id="eq-low" min="-12" max="12" value="0" class="vertical accent-slate-900"><span class="text-[5px] font-bold">LOW</span></div>
+                        <div class="flex flex-col items-center gap-1"><input type="range" id="eq-midlow" min="-12" max="12" value="0" class="vertical accent-slate-900"><span class="text-[5px] font-bold">M-L</span></div>
+                        <div class="flex flex-col items-center gap-1"><input type="range" id="eq-mid" min="-12" max="12" value="0" class="vertical accent-slate-900"><span class="text-[5px] font-bold">MID</span></div>
+                        <div class="flex flex-col items-center gap-1"><input type="range" id="eq-midhigh" min="-12" max="12" value="0" class="vertical accent-slate-900"><span class="text-[5px] font-bold">M-H</span></div>
+                        <div class="flex flex-col items-center gap-1"><input type="range" id="eq-high" min="-12" max="12" value="0" class="vertical accent-slate-900"><span class="text-[5px] font-bold">HI</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voice Bank -->
+            <div class="md:col-span-4">
+                <div class="voice-panel h-full flex flex-col gap-2">
+                    <div class="flex justify-between items-center border-b border-white/10 pb-1">
+                        <p class="text-[8px] font-bold text-white/40 uppercase tracking-widest">Global Voice</p>
+                        <div class="flex gap-1">
+                            <button onclick="scrollVoices(-1)" class="tactile-btn w-5 h-5 rounded-full text-[10px]">&lsaquo;</button>
+                            <button onclick="scrollVoices(1)" class="tactile-btn w-5 h-5 rounded-full text-[10px]">&rsaquo;</button>
+                        </div>
+                    </div>
+                    <div id="category-tabs" class="flex flex-wrap gap-1"></div>
+                    <div id="voice-grid" class="voice-grid"></div>
+                </div>
+            </div>
+
+            <!-- Harmonizer & FX -->
+            <div class="md:col-span-4 flex flex-col gap-2">
+                <div class="bg-slate-950/60 p-2 rounded border border-white/5 shadow-2xl">
+                    <div class="flex justify-between items-center mb-1">
+                        <p class="text-[8px] font-bold text-sky-400 uppercase tracking-widest">Harmonizer</p>
+                        <div id="chord-type-led" class="text-[7px] font-mono text-sky-400 bg-sky-900/40 px-1 rounded border border-sky-800">MAJ</div>
+                    </div>
+                    <div class="grid grid-cols-5 gap-1 mb-1">
+                        <button onclick="setChordType('major')" id="type-major" class="chord-type-btn tactile-btn py-1 rounded text-[7px] active">Maj</button>
+                        <button onclick="setChordType('minor')" id="type-minor" class="chord-type-btn tactile-btn py-1 rounded text-[7px]">Min</button>
+                        <button onclick="setChordType('dom7')" id="type-dom7" class="chord-type-btn tactile-btn py-1 rounded text-[7px]">7</button>
+                        <button onclick="setChordType('maj7')" id="type-maj7" class="chord-type-btn tactile-btn py-1 rounded text-[7px]">M7</button>
+                        <button onclick="setChordType('min7')" id="type-min7" class="chord-type-btn tactile-btn py-1 rounded text-[7px]">m7</button>
+                    </div>
+                    <div class="grid grid-cols-6 gap-1">
+                        <button onmousedown="playChord('C')" onmouseup="stopChord('C')" class="tactile-btn py-2 rounded text-[8px]">C</button>
+                        <button onmousedown="playChord('D')" onmouseup="stopChord('D')" class="tactile-btn py-2 rounded text-[8px]">D</button>
+                        <button onmousedown="playChord('E')" onmouseup="stopChord('E')" class="tactile-btn py-2 rounded text-[8px]">E</button>
+                        <button onmousedown="playChord('F')" onmouseup="stopChord('F')" class="tactile-btn py-2 rounded text-[8px]">F</button>
+                        <button onmousedown="playChord('G')" onmouseup="stopChord('G')" class="tactile-btn py-2 rounded text-[8px]">G</button>
+                        <button onmousedown="playChord('A')" onmouseup="stopChord('A')" class="tactile-btn py-2 rounded text-[8px]">A</button>
+                    </div>
+                </div>
+                <div class="bg-slate-950/60 p-2 rounded border border-white/5 flex-1 grid grid-cols-3 gap-2 shadow-2xl">
+                    <button onclick="toggleSustain()" id="btn-sustain" class="tactile-btn py-1 rounded"><div id="led-sustain" class="led"></div>Sust</button>
+                    <button onclick="toggleEcho()" id="btn-echo" class="tactile-btn py-1 rounded"><div id="led-echo" class="led"></div>Echo</button>
+                    <button onclick="toggleLoop()" id="btn-loop" class="tactile-btn py-1 rounded text-red-400"><div id="led-loop" class="led"></div>Beat</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keybed -->
+        <div class="flex items-end gap-2 sm:gap-4 mt-1">
+            <div class="flex flex-col items-center gap-1 p-1 bg-slate-950/60 rounded border border-white/10">
+                <div class="pitch-wheel" id="pitch-wheel"><div class="wheel-handle" id="wheel-handle"></div></div>
+                <label class="text-[6px] font-bold uppercase text-white/30">Pitch</label>
+            </div>
+            <div class="keyboard-scroll-wrap" id="kb-scroll-wrap">
+                <div id="keyboard" class="keyboard-container select-none"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let audioCtx = null, masterGain = null, analyser = null;
+        let filters = [], reverbNode = null, delayNode = null, delayMix = null;
+        let currentInstrument = 'piano', activeNotes = new Map(), sustainedNotes = new Set();
+        let sustainActive = false, echoActive = false, pitchBendSemi = 0, lastFrequency = 0, portamentoTime = 0.05;
+        let activeLoop = null, loopInterval = null, currentTempo = 120, currentChordType = 'major', globalOctaveShift = 0;
+        let currentCategory = 'Keyboard', voicePageIndex = 0;
+        
+        let currentWhiteKeyWidth = 45; 
+        let isMouseDown = false;
+        let lastKeyPointed = null;
+
+        const chordIntervals = { major: [0, 4, 7], minor: [0, 3, 7], dom7: [0, 4, 7, 10], maj7: [0, 4, 7, 11], min7: [0, 3, 7, 10] };
+
+        const globalLibrary = {
+            "Keyboard": [
+                { id: 'piano', name: 'Grand Piano', kw: 'grand-piano', harmonics: [{type: 'triangle', gain: 0.8}, {type:'sine', gain:0.2}], attack: 0.005, decay: 0.8, sustain: 0.1, release: 1.0, filter: 2000 },
+                { id: 'epiano', name: 'E-Piano', kw: 'electric-piano', harmonics: [{type: 'sine', gain: 0.9}, {type:'sine', gain:0.3, detune:1200}], attack: 0.01, decay: 1.2, sustain: 0.2, release: 0.8, filter: 1500 },
+                { id: 'accordion', name: 'Accordion', kw: 'accordion', harmonics: [{type: 'square', gain: 0.6, detune: 8}], attack: 0.06, decay: 0.1, sustain: 0.9, release: 0.3, filter: 1000 }
+            ],
+            "Strings": [
+                { id: 'violin', name: 'Violin', kw: 'violin', harmonics: [{type: 'sawtooth', gain: 0.7}], attack: 0.2, decay: 0.2, sustain: 0.8, release: 0.5, filter: 2200, vibrato: true },
+                { id: 'cello', name: 'Cello', kw: 'cello', harmonics: [{type: 'sawtooth', gain: 0.6}], attack: 0.3, decay: 0.3, sustain: 0.9, release: 0.7, filter: 1200, octaveOffset: -1 },
+                { id: 'harp', name: 'Concert Harp', kw: 'harp', harmonics: [{type: 'triangle', gain: 1}], attack: 0.002, decay: 2.0, sustain: 0, release: 2.5, filter: 3500 }
+            ],
+            "Plucked": [
+                { id: 'acguitar', name: 'Acoustic Gtr', kw: 'acoustic-guitar', harmonics: [{type: 'triangle', gain: 1}], attack: 0.005, decay: 0.6, sustain: 0, release: 1.5, filter: 3000, transient: 'pluck' },
+                { id: 'bass', name: 'Bass Guitar', kw: 'bass-guitar', harmonics: [{type: 'square', gain: 1}], attack: 0.02, decay: 0.1, sustain: 0.8, release: 0.2, filter: 600, octaveOffset: -1 },
+                { id: 'veena', name: 'Veena', kw: 'veena', harmonics: [{type: 'sawtooth', gain: 0.6}], attack: 0.03, decay: 1.5, sustain: 0.2, release: 1.0, filter: 1200, vibrato: true }
+            ],
+            "Winds": [
+                { id: 'flute', name: 'Silver Flute', kw: 'flute', harmonics: [{type: 'sine', gain: 1}], attack: 0.1, decay: 0.2, sustain: 0.8, release: 0.4, filter: 1500, transient: 'breath', vibrato: true },
+                { id: 'sax', name: 'Saxophone', kw: 'saxophone', harmonics: [{type: 'sawtooth', gain: 0.8}], attack: 0.08, decay: 0.1, sustain: 0.7, release: 0.4, filter: 1800, resonance: 8 },
+                { id: 'trumpet', name: 'Trumpet', kw: 'trumpet', harmonics: [{type: 'sawtooth', gain: 0.8}], attack: 0.03, decay: 0.1, sustain: 0.6, release: 0.3, filter: 3500 }
+            ],
+            "Vocal": [
+                { id: 'choir_aah', name: 'Aah Choir', kw: 'choir', harmonics: [{type: 'sine', gain: 0.7}, {type:'triangle', gain:0.3}], attack: 0.4, decay: 0.5, sustain: 0.8, release: 1.5, filter: 800 },
+                { id: 'choir_ooh', name: 'Ooh Choir', kw: 'choir', harmonics: [{type: 'sine', gain: 1}], attack: 0.5, decay: 0.5, sustain: 0.9, release: 2.0, filter: 400 }
+            ],
+            "Percussion": [
+                { id: 'drums', name: 'Drum Kit', kw: 'drum-set', type: 'special' },
+                { id: 'mridangam', name: 'Mridangam', kw: 'mridangam', type: 'special_mrid' },
+                { id: 'xylophone', name: 'Xylophone', kw: 'xylophone', harmonics: [{type: 'sine', gain: 1}], attack: 0.001, decay: 0.1, sustain: 0, release: 0.2, filter: 5000 }
+            ]
+        };
+
+        const notes = [{name:'C'},{name:'C#'},{name:'D'},{name:'D#'},{name:'E'},{name:'F'},{name:'F#'},{name:'G'},{name:'G#'},{name:'A'},{name:'A#'},{name:'B'}];
+
+        async function initAudio() {
+            if (audioCtx) { if (audioCtx.state === 'suspended') await audioCtx.resume(); return; }
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                masterGain = audioCtx.createGain(); masterGain.gain.value = document.getElementById('volume').value;
+                const fConfigs = [{t:'lowshelf', f:60}, {t:'peaking', f:250}, {t:'peaking', f:1000}, {t:'peaking', f:4000}, {t:'highshelf', f:12000}];
+                filters = fConfigs.map(c => { const f = audioCtx.createBiquadFilter(); f.type = c.t; f.frequency.value = c.f; f.Q.value = 1; return f; });
+                analyser = audioCtx.createAnalyser(); analyser.fftSize = 128;
+                delayNode = audioCtx.createDelay(1.0); delayNode.delayTime.value = 0.375;
+                delayMix = audioCtx.createGain(); delayMix.gain.value = 0;
+                const delayFB = audioCtx.createGain(); delayFB.gain.value = 0.3;
+                delayNode.connect(delayFB); delayFB.connect(delayNode); delayNode.connect(delayMix);
+                let lastNode = filters[0]; for(let i=1; i<filters.length; i++) { lastNode.connect(filters[i]); lastNode = filters[i]; }
+                lastNode.connect(analyser); analyser.connect(masterGain); masterGain.connect(audioCtx.destination); delayMix.connect(audioCtx.destination);
+                startVisualizer(); initMIDI();
+            } catch(e) { console.error(e); }
+        }
+
+        function startVisualizer() {
+            const canvas = document.getElementById('visualizer'), ctx = canvas.getContext('2d');
+            const draw = () => {
+                requestAnimationFrame(draw);
+                const data = new Uint8Array(analyser.frequencyBinCount); analyser.getByteFrequencyData(data);
+                canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                const barW = (canvas.width / data.length) * 2;
+                for (let i = 0; i < data.length; i++) {
+                    ctx.fillStyle = `rgba(0, 0, 0, 0.2)`;
+                    ctx.fillRect(i * barW, canvas.height - (data[i]/255*canvas.height), barW - 1, canvas.height);
+                }
+            };
+            draw();
+        }
+
+        function getFrequency(note, octave, offset = 0) {
+            const n = notes.findIndex(i => i.name === note);
+            return 440 * Math.pow(2, ((n + (octave + offset + globalOctaveShift) * 12) - 57) / 12 + (pitchBendSemi / 12));
+        }
+
+        function playNote(note, octave, keyEl) {
+            initAudio();
+            const noteId = `${note}${octave}`;
+            if (activeNotes.has(noteId)) releaseOsc(activeNotes.get(noteId));
+            const inst = getInstrumentData(currentInstrument);
+            
+            if (inst.type === 'special' || inst.type === 'special_mrid') {
+                const time = audioCtx.currentTime;
+                const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                const freq = (note === 'C') ? 60 : (note === 'D' ? 3000 : 8000);
+                o.frequency.setValueAtTime(freq, time);
+                g.gain.setValueAtTime(0.5, time); g.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
+                o.connect(g); g.connect(filters[0]); o.start(); o.stop(time+0.2);
+                if(keyEl) keyEl.classList.add('active');
+                setTimeout(() => { if(keyEl) keyEl.classList.remove('active'); }, 100);
+                return;
+            }
+
+            const mGain = audioCtx.createGain();
+            const oscillators = inst.harmonics.map(h => {
+                const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                o.type = h.type; o.frequency.setValueAtTime(getFrequency(note, octave, inst.octaveOffset || 0), audioCtx.currentTime);
+                o.detune.value = h.detune || 0; g.gain.value = h.gain;
+                o.connect(g); g.connect(mGain); o.start(); return o;
+            });
+            mGain.gain.setValueAtTime(0, audioCtx.currentTime);
+            mGain.gain.linearRampToValueAtTime(0.7, audioCtx.currentTime + inst.attack);
+            mGain.gain.exponentialRampToValueAtTime(inst.sustain || 0.1, audioCtx.currentTime + inst.attack + inst.decay);
+            mGain.connect(filters[0]); if (echoActive) mGain.connect(delayNode);
+            activeNotes.set(noteId, { os: oscillators, g: mGain, note, octave, keyEl });
+            if(keyEl) keyEl.classList.add('active');
+        }
+
+        function releaseOsc(d) {
+            const now = audioCtx.currentTime;
+            d.g.gain.cancelScheduledValues(now); d.g.gain.setValueAtTime(d.g.gain.value, now);
+            d.g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+            setTimeout(() => { d.os.forEach(o => { try{o.stop(); o.disconnect();}catch(e){} }); }, 1000);
+            if(d.keyEl) d.keyEl.classList.remove('active');
+        }
+
+        function stopNote(note, octave) {
+            const noteId = `${note}${octave}`; const d = activeNotes.get(noteId);
+            if (d) { if (sustainActive) sustainedNotes.add(noteId); else { releaseOsc(d); activeNotes.delete(noteId); } }
+        }
+
+        function getInstrumentData(id) { for (let c in globalLibrary) { let i = globalLibrary[c].find(x => x.id === id); if(i) return i; } return globalLibrary.Keyboard[0]; }
+        function setInstrument(id, cat) { currentInstrument = id; currentCategory = cat || currentCategory; const i = getInstrumentData(id); document.getElementById('active-inst-display').innerText = i.name; document.getElementById('inst-preview-img').src = `https://loremflickr.com/160/160/${i.kw || 'instrument'},music`; renderVoiceGrid(); }
+        function changeOctave(dir) { globalOctaveShift = Math.max(-2, Math.min(2, globalOctaveShift + dir)); document.getElementById('octave-display').innerText = globalOctaveShift; }
+        function changeKeyWidth(delta) { currentWhiteKeyWidth = Math.max(25, Math.min(100, currentWhiteKeyWidth + delta)); buildKeyboard(); }
+        function scrollVoices(dir) { const max = Math.ceil(globalLibrary[currentCategory].length / 4) - 1; voicePageIndex = Math.max(0, Math.min(max, voicePageIndex + dir)); renderVoiceGrid(); }
+
+        function renderVoiceGrid() {
+            const grid = document.getElementById('voice-grid'); grid.innerHTML = '';
+            const insts = globalLibrary[currentCategory];
+            const start = voicePageIndex * 4;
+            insts.slice(start, start + 4).forEach(i => {
+                const b = document.createElement('button'); b.className = `tactile-btn p-2 rounded ${i.id === currentInstrument ? 'active' : ''}`;
+                b.innerHTML = `<div class="led ${i.id === currentInstrument ? 'active' : ''}"></div><span class="truncate w-full text-white/80">${i.name}</span>`;
+                b.onclick = () => setInstrument(i.id, currentCategory); grid.appendChild(b);
+            });
+        }
+
+        function populateVoiceTabs() {
+            const tabs = document.getElementById('category-tabs'); tabs.innerHTML = '';
+            Object.keys(globalLibrary).forEach(cat => {
+                const t = document.createElement('div'); t.className = `category-tab ${cat === currentCategory ? 'active' : ''}`;
+                t.innerText = cat; t.onclick = () => { currentCategory = cat; voicePageIndex = 0; populateVoiceTabs(); renderVoiceGrid(); }; tabs.appendChild(t);
+            });
+        }
+
+        function buildKeyboard() {
+            const kb = document.getElementById('keyboard'); kb.innerHTML = '';
+            let wIdx = 0;
+            const blackWidth = currentWhiteKeyWidth * 0.65;
+            const startOctave = currentWhiteKeyWidth > 60 ? 3 : (currentWhiteKeyWidth > 40 ? 2 : 1);
+            const endOctave = currentWhiteKeyWidth < 40 ? 8 : (currentWhiteKeyWidth < 70 ? 7 : 6);
+
+            for (let o = startOctave; o < endOctave; o++) {
+                notes.forEach(note => {
+                    const key = document.createElement('div');
+                    const isS = note.name.includes('#');
+                    key.className = `key ${isS ? 'black-key' : 'white-key'}`;
+                    key.id = `kb-key-${note.name}-${o}`;
+                    key.dataset.note = note.name;
+                    key.dataset.octave = o;
+                    key.style.width = (isS ? blackWidth : currentWhiteKeyWidth) + 'px';
+                    key.style.left = (isS ? wIdx : wIdx++) * currentWhiteKeyWidth + 'px';
+
+                    const startPlay = (e) => { e.preventDefault(); isMouseDown = true; playNote(note.name, o, key); lastKeyPointed = key; };
+                    const endPlay = (e) => { e.preventDefault(); stopNote(note.name, o); };
+
+                    key.addEventListener('mousedown', startPlay);
+                    key.addEventListener('mouseenter', () => { if(isMouseDown) { playNote(note.name, o, key); lastKeyPointed = key; } });
+                    key.addEventListener('mouseleave', () => { if(!sustainActive) stopNote(note.name, o); });
+                    key.addEventListener('mouseup', () => isMouseDown = false);
+                    key.addEventListener('touchstart', startPlay, {passive:false});
+                    key.addEventListener('touchend', endPlay, {passive:false});
+                    kb.appendChild(key);
+                });
+            }
+            const fC = document.createElement('div'); fC.className = 'key white-key'; fC.id = `kb-key-C-${endOctave}`; 
+            fC.style.width = currentWhiteKeyWidth + 'px'; fC.style.left = wIdx * currentWhiteKeyWidth + 'px';
+            fC.dataset.note = 'C'; fC.dataset.octave = endOctave;
+            fC.addEventListener('mousedown', e => { isMouseDown = true; playNote('C', endOctave, fC); lastKeyPointed = fC; });
+            fC.addEventListener('mouseenter', () => { if(isMouseDown) { playNote('C', endOctave, fC); lastKeyPointed = fC; } });
+            fC.addEventListener('mouseleave', () => stopNote('C', endOctave));
+            kb.appendChild(fC);
+
+            kb.style.width = ((wIdx + 1) * currentWhiteKeyWidth) + 'px';
+            const scrollWrap = document.getElementById('kb-scroll-wrap');
+            const targetKey = document.getElementById('kb-key-C-4');
+            if(targetKey) scrollWrap.scrollLeft = targetKey.offsetLeft - (scrollWrap.offsetWidth / 2) + (currentWhiteKeyWidth / 2);
+        }
+
+        window.addEventListener('mouseup', () => { isMouseDown = false; });
+        const kbContainer = document.getElementById('keyboard');
+        kbContainer.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (target && target.classList.contains('key') && target !== lastKeyPointed) {
+                if (lastKeyPointed && !sustainActive) stopNote(lastKeyPointed.dataset.note, parseInt(lastKeyPointed.dataset.octave));
+                playNote(target.dataset.note, parseInt(target.dataset.octave), target);
+                lastKeyPointed = target;
+            }
+        }, {passive: false});
+
+        function setChordType(t) { currentChordType = t; document.querySelectorAll('.chord-type-btn').forEach(b => b.classList.remove('active')); document.getElementById(`type-${t}`).classList.add('active'); document.getElementById('chord-type-led').innerText = t.toUpperCase().substring(0,4); }
+        function playChord(r) { initAudio(); const idx = notes.findIndex(n => n.name === r); chordIntervals[currentChordType].forEach(off => { const nIdx = (idx+off)%12, oct = 4 + Math.floor((idx+off)/12); playNote(notes[nIdx].name, oct, document.getElementById(`kb-key-${notes[nIdx].name}-${oct}`)); }); }
+        function stopChord(r) { const idx = notes.findIndex(n => n.name === r); chordIntervals[currentChordType].forEach(off => { const nIdx = (idx+off)%12; stopNote(notes[nIdx].name, 4+Math.floor((idx+off)/12)); }); }
+        function toggleSustain() { sustainActive = !sustainActive; document.getElementById('led-sustain').classList.toggle('active'); if(!sustainActive) { sustainedNotes.forEach(id => { const d = activeNotes.get(id); if(d) releaseOsc(d); activeNotes.delete(id); }); sustainedNotes.clear(); } }
+        function toggleEcho() { echoActive = !echoActive; document.getElementById('led-echo').classList.toggle('active'); if (delayMix) delayMix.gain.setTargetAtTime(echoActive ? 0.4 : 0, audioCtx.currentTime, 0.1); }
+        function toggleLoop() { initAudio(); if(activeLoop){ clearInterval(loopInterval); activeLoop = null; document.getElementById('led-loop').classList.remove('active'); } else { activeLoop = true; document.getElementById('led-loop').classList.add('active'); loopInterval = setInterval(() => { const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.frequency.setValueAtTime(60, audioCtx.currentTime); g.gain.setValueAtTime(0.5, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2); o.connect(g); g.connect(filters[0]); o.start(); o.stop(audioCtx.currentTime+0.2); }, 500); } }
+        function initMIDI() { if(navigator.requestMIDIAccess) navigator.requestMIDIAccess().then(m => { document.getElementById('midi-led').classList.add('active'); for(let i of m.inputs.values()) i.onmidimessage = (msg) => { const [c,n,v] = msg.data; const name = notes[n%12].name, oct = Math.floor(n/12)-1; if(c===144 && v>0) playNote(name,oct,document.getElementById(`kb-key-${name}-${oct}`)); else if(c===128 || (c===144 && v===0)) stopNote(name,oct); }; }); }
+        function updateOscFreqs() { activeNotes.forEach(d => { if (d.os) { d.os.forEach(o => { const f = getFrequency(d.note, d.octave, getInstrumentData(currentInstrument).octaveOffset || 0); o.frequency.setTargetAtTime(f, audioCtx.currentTime, 0.05); }); } }); }
+        const wheel = document.getElementById('pitch-wheel'), handle = document.getElementById('wheel-handle');
+        let isWheelDragging = false;
+        const updateWheel = (y) => { const r = wheel.getBoundingClientRect(); let relY = Math.max(0, Math.min(1, (y - r.top) / r.height)); pitchBendSemi = (0.5 - relY) * 4; handle.style.top = (relY * 100) + '%'; updateOscFreqs(); };
+        const resetWheel = () => { if (!isWheelDragging) return; isWheelDragging = false; pitchBendSemi = 0; handle.style.top = '50%'; updateOscFreqs(); };
+        wheel.addEventListener('mousedown', (e) => { isWheelDragging = true; updateWheel(e.clientY); });
+        window.addEventListener('mousemove', (e) => { if (isWheelDragging) updateWheel(e.clientY); });
+        window.addEventListener('mouseup', resetWheel);
+        wheel.addEventListener('touchstart', (e) => { e.preventDefault(); isWheelDragging = true; updateWheel(e.touches[0].clientY); }, {passive: false});
+        window.addEventListener('touchmove', (e) => { if (isWheelDragging) { e.preventDefault(); updateWheel(e.touches[0].clientY); } }, {passive: false});
+        window.addEventListener('touchend', resetWheel);
+
+        buildKeyboard(); populateVoiceTabs(); renderVoiceGrid();
+        ['low','midlow','mid','midhigh','high'].forEach((id, i) => document.getElementById(`eq-${id}`).oninput = (e) => { if(filters[i]) filters[i].gain.value = e.target.value; });
+        document.getElementById('volume').oninput = (e) => { if(masterGain) masterGain.gain.setTargetAtTime(e.target.value, audioCtx.currentTime, 0.05); };
+    </script>
+</body>
+</html>
